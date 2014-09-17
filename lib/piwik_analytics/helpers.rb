@@ -16,7 +16,7 @@ module PiwikAnalytics
         end
       end
       turbolinks_start = uses_turbolinks ? 'document.addEventListener("page:update", function() {' : ''
-      turbolinks_end = uses_turbolinks ? '};' : ''
+      turbolinks_end = uses_turbolinks ? '});' : ''
 
       if config.use_async?
         tag = <<-CODE
@@ -47,7 +47,6 @@ module PiwikAnalytics
           #{turbolinks_start}
           var pkBaseURL = (("https:" == document.location.protocol) ? "https://#{config.url}/" : "http://#{config.url}/");
           document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-          </script><script type="text/javascript">
           try {
             var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", #{config.id_site});
             #{trackingTimer}
