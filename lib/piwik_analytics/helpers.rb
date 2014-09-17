@@ -1,6 +1,6 @@
 module PiwikAnalytics
   module Helpers
-    def piwik_tracking_tag
+    def piwik_tracking_tag uses_turoblinks: false
       config = PiwikAnalytics.configuration
       return if config.disabled?
 
@@ -15,11 +15,14 @@ module PiwikAnalytics
           CODE
         end
       end
+      turbolinks_start = uses_turbolinks ? 'document.addEventListener("page:update", function() {' : ''
+      turbolinks_end = uses_turbolinks ? '};' : ''
 
       if config.use_async?
         tag = <<-CODE
         <!-- Piwik -->
         <script type="text/javascript">
+          #{turbolinks_start}
           var _paq = _paq || [];
             #{trackingTimer}
           _paq.push(['trackPageView']);
@@ -31,6 +34,7 @@ module PiwikAnalytics
             var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
             g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
           })();
+          #{turbolinks_end}
         </script>
         <noscript><p><img src="http://#{config.url}/piwik.php?idsite=#{config.id_site}" style="border:0;" alt="" /></p></noscript>
         <!-- End Piwik Code -->
@@ -40,15 +44,17 @@ module PiwikAnalytics
         tag = <<-CODE
         <!-- Piwik -->
         <script type="text/javascript">
-        var pkBaseURL = (("https:" == document.location.protocol) ? "https://#{config.url}/" : "http://#{config.url}/");
-        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-        </script><script type="text/javascript">
-        try {
-                var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", #{config.id_site});
-                #{trackingTimer}
-                piwikTracker.trackPageView();
-                piwikTracker.enableLinkTracking();
-        } catch( err ) {}
+          #{turbolinks_start}
+          var pkBaseURL = (("https:" == document.location.protocol) ? "https://#{config.url}/" : "http://#{config.url}/");
+          document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+          </script><script type="text/javascript">
+          try {
+            var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", #{config.id_site});
+            #{trackingTimer}
+            piwikTracker.trackPageView();
+            piwikTracker.enableLinkTracking();
+          } catch( err ) {}
+          #{turbolinks_end}
         </script>
         <!-- End Piwik Tag -->
         CODE
