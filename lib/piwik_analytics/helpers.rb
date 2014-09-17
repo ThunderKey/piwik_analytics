@@ -1,6 +1,6 @@
 module PiwikAnalytics
   module Helpers
-    def piwik_tracking_tag uses_turoblinks: false
+    def piwik_tracking_tag uses_turbolinks: false
       config = PiwikAnalytics.configuration
       return if config.disabled?
 
